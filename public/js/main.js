@@ -12,14 +12,14 @@ $(function () {
   var OverviewItemModel = Backbone.Model.extend({})
   var OverviewItemCollection = Backbone.Collection.extend({
     model: OverviewItemModel
-  })
+  });
 
   var JobItemModel = Backbone.Model.extend({
     idAttribute: '_id',
     defaults: {
       selected: false
     }
-  })
+  });
   var JobItemCollection = Backbone.Collection.extend({
     model: JobItemModel
   })
@@ -177,7 +177,7 @@ $(function () {
     requeueJobs: function () {
       var selectedJobIds = this.getSelectedJobs().map(function (j) { return j.get('_id') })
       postJobs('requeue', selectedJobIds)
-      .success(function () {
+      .then(function () {
         App.trigger('refreshData')
       })
     },
@@ -187,7 +187,7 @@ $(function () {
     deleteJobs: function () {
       var selectedJobIds = this.getSelectedJobs().map(function (j) { return j.get('_id') })
       postJobs('delete', selectedJobIds)
-      .success(function () {
+      .then(function () {
         App.trigger('refreshData')
       })
     }
@@ -235,7 +235,7 @@ $(function () {
     },
     requeueJob: function (e) {
       postJobs('requeue', [this.model.get('job')._id])
-      .success(function () {
+      .then(function () {
         $(e.currentTarget).remove()
         App.trigger('refreshData')
       })
@@ -245,7 +245,7 @@ $(function () {
     },
     deleteJob: function (e) {
       postJobs('delete', [this.model.get('job')._id])
-      .success(function () {
+      .then(function () {
         App.trigger('refreshData')
       })
     },
@@ -256,7 +256,7 @@ $(function () {
       this.$el.html(this.template(this.model.toJSON()))
       return this
     }
-  })
+  });
 
   var SelectJobsView = Backbone.View.extend({
     el: '#select-jobs',
@@ -270,7 +270,7 @@ $(function () {
       'click [data-action=select-none]': 'selectNone'
     },
     scheduleJob: function () {
-      $(App.createJobPaneView.el).find('input').val('')
+      $(App.createJobPaneView.el).find('input').val('');
       $(App.createJobPaneView.el).show()
     },
     selectAll: function () {
@@ -377,30 +377,30 @@ $(function () {
       this.jobDetailsView.showJob(jobItem)
     },
     fetchData: function () {
-      this._fetchRequest && this._fetchRequest.abort()
-      this._fetchTimeout && clearTimeout(this._fetchTimeout)
+      // this._fetchRequest && this._fetchRequest.abort()
+      this._fetchTimeout && clearTimeout(this._fetchTimeout);
       this._fetchRequest = $.get('api', {
         job: this.currentRequest.get('job'),
         state: this.currentRequest.get('state')
-      }).success(this.resultsFetched)
+      }).then(this.resultsFetched)
     },
     resultsFetched: function (results) {
-      this.overviewItems.set(results.overview)
+      this.overviewItems.set(results.overview);
       this.activeTitle.set({
         job: results.currentRequest.job,
         state: results.currentRequest.state
-      })
+      });
       this.render(results)
-      this.jobItems.set(results.jobs)
+      this.jobItems.set(results.jobs);
       this._fetchTimeout = setTimeout(this.fetchData, this.currentRequest.get('refreshInterval'))
     },
     render: function (results) {
-      document.title = results.title
-      $('.page-title').text(results.title)
+      document.title = results.title;
+      $('.page-title').text(results.title);
     }
-  })
+  });
 
-  var App = new AppView()
+  var App = new AppView();
 
   function postJobs (action, jobIds) {
     return $.ajax({
@@ -411,4 +411,4 @@ $(function () {
       dataType: 'json'
     })
   }
-})
+});
